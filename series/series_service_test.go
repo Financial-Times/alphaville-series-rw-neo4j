@@ -10,39 +10,39 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var subjectsDriver baseftrwapp.Service
+var seriesDriver baseftrwapp.Service
 
 func TestDelete(t *testing.T) {
 	assert := assert.New(t)
 	uuid := "12345"
 
-	subjectsDriver = getSubjectsCypherDriver(t)
+	seriesDriver = getSeriesCypherDriver(t)
 
-	subjectToDelete := Subject{UUID: uuid, CanonicalName: "Test", TmeIdentifier: "TME_ID"}
+	seriesToDelete := Series{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(subjectsDriver.Write(subjectToDelete), "Failed to write subject")
+	assert.NoError(seriesDriver.Write(seriesToDelete), "Failed to write series")
 
-	found, err := subjectsDriver.Delete(uuid)
-	assert.True(found, "Didn't manage to delete subject for uuid %", uuid)
-	assert.NoError(err, "Error deleting subject for uuid %s", uuid)
+	found, err := seriesDriver.Delete(uuid)
+	assert.True(found, "Didn't manage to delete series for uuid %", uuid)
+	assert.NoError(err, "Error deleting series for uuid %s", uuid)
 
-	p, found, err := subjectsDriver.Read(uuid)
+	p, found, err := seriesDriver.Read(uuid)
 
-	assert.Equal(Subject{}, p, "Found subject %s who should have been deleted", p)
-	assert.False(found, "Found subject for uuid %s who should have been deleted", uuid)
-	assert.NoError(err, "Error trying to find subject for uuid %s", uuid)
+	assert.Equal(Series{}, p, "Found series %s who should have been deleted", p)
+	assert.False(found, "Found series for uuid %s who should have been deleted", uuid)
+	assert.NoError(err, "Error trying to find series for uuid %s", uuid)
 }
 
 func TestCreateAllValuesPresent(t *testing.T) {
 	assert := assert.New(t)
 	uuid := "12345"
-	subjectsDriver = getSubjectsCypherDriver(t)
+	seriesDriver = getSeriesCypherDriver(t)
 
-	subjectToWrite := Subject{UUID: uuid, CanonicalName: "Test", TmeIdentifier: "TME_ID"}
+	seriesToWrite := Series{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(subjectsDriver.Write(subjectToWrite), "Failed to write subject")
+	assert.NoError(seriesDriver.Write(seriesToWrite), "Failed to write series")
 
-	readSubjectForUUIDAndCheckFieldsMatch(t, uuid, subjectToWrite)
+	readSeriesForUUIDAndCheckFieldsMatch(t, uuid, seriesToWrite)
 
 	cleanUp(t, uuid)
 }
@@ -50,13 +50,13 @@ func TestCreateAllValuesPresent(t *testing.T) {
 func TestCreateHandlesSpecialCharacters(t *testing.T) {
 	assert := assert.New(t)
 	uuid := "12345"
-	subjectsDriver = getSubjectsCypherDriver(t)
+	seriesDriver = getSeriesCypherDriver(t)
 
-	subjectToWrite := Subject{UUID: uuid, CanonicalName: "Test 'special chars", TmeIdentifier: "TME_ID"}
+	seriesToWrite := Series{UUID: uuid, PrefLabel: "Test 'special chars", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(subjectsDriver.Write(subjectToWrite), "Failed to write subject")
+	assert.NoError(seriesDriver.Write(seriesToWrite), "Failed to write series")
 
-	readSubjectForUUIDAndCheckFieldsMatch(t, uuid, subjectToWrite)
+	readSeriesForUUIDAndCheckFieldsMatch(t, uuid, seriesToWrite)
 
 	cleanUp(t, uuid)
 }
@@ -64,13 +64,13 @@ func TestCreateHandlesSpecialCharacters(t *testing.T) {
 func TestCreateNotAllValuesPresent(t *testing.T) {
 	assert := assert.New(t)
 	uuid := "12345"
-	subjectsDriver = getSubjectsCypherDriver(t)
+	seriesDriver = getSeriesCypherDriver(t)
 
-	subjectToWrite := Subject{UUID: uuid, CanonicalName: "Test"}
+	seriesToWrite := Series{UUID: uuid, PrefLabel: "Test"}
 
-	assert.NoError(subjectsDriver.Write(subjectToWrite), "Failed to write subject")
+	assert.NoError(seriesDriver.Write(seriesToWrite), "Failed to write series")
 
-	readSubjectForUUIDAndCheckFieldsMatch(t, uuid, subjectToWrite)
+	readSeriesForUUIDAndCheckFieldsMatch(t, uuid, seriesToWrite)
 
 	cleanUp(t, uuid)
 }
@@ -78,29 +78,29 @@ func TestCreateNotAllValuesPresent(t *testing.T) {
 func TestUpdateWillRemovePropertiesNoLongerPresent(t *testing.T) {
 	assert := assert.New(t)
 	uuid := "12345"
-	subjectsDriver = getSubjectsCypherDriver(t)
+	seriesDriver = getSeriesCypherDriver(t)
 
-	subjectToWrite := Subject{UUID: uuid, CanonicalName: "Test", TmeIdentifier: "TME_ID"}
+	seriesToWrite := Series{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(subjectsDriver.Write(subjectToWrite), "Failed to write subject")
-	readSubjectForUUIDAndCheckFieldsMatch(t, uuid, subjectToWrite)
+	assert.NoError(seriesDriver.Write(seriesToWrite), "Failed to write series")
+	readSeriesForUUIDAndCheckFieldsMatch(t, uuid, seriesToWrite)
 
-	updatedSubject := Subject{UUID: uuid, CanonicalName: "Test", TmeIdentifier: "TME_ID"}
+	updatedSeries := Series{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(subjectsDriver.Write(updatedSubject), "Failed to write updated subject")
-	readSubjectForUUIDAndCheckFieldsMatch(t, uuid, updatedSubject)
+	assert.NoError(seriesDriver.Write(updatedSeries), "Failed to write updated series")
+	readSeriesForUUIDAndCheckFieldsMatch(t, uuid, updatedSeries)
 
 	cleanUp(t, uuid)
 }
 
 func TestConnectivityCheck(t *testing.T) {
 	assert := assert.New(t)
-	subjectsDriver = getSubjectsCypherDriver(t)
-	err := subjectsDriver.Check()
+	seriesDriver = getSeriesCypherDriver(t)
+	err := seriesDriver.Check()
 	assert.NoError(err, "Unexpected error on connectivity check")
 }
 
-func getSubjectsCypherDriver(t *testing.T) service {
+func getSeriesCypherDriver(t *testing.T) service {
 	assert := assert.New(t)
 	url := os.Getenv("NEO4J_TEST_URL")
 	if url == "" {
@@ -109,25 +109,25 @@ func getSubjectsCypherDriver(t *testing.T) service {
 
 	db, err := neoism.Connect(url)
 	assert.NoError(err, "Failed to connect to Neo4j")
-	return NewCypherSubjectsService(neoutils.StringerDb{db}, db)
+	return NewCypherSeriesService(neoutils.StringerDb{db}, db)
 }
 
-func readSubjectForUUIDAndCheckFieldsMatch(t *testing.T, uuid string, expectedSubject Subject) {
+func readSeriesForUUIDAndCheckFieldsMatch(t *testing.T, uuid string, expectedSeries Series) {
 	assert := assert.New(t)
-	storedSubject, found, err := subjectsDriver.Read(uuid)
+	storedSeries, found, err := seriesDriver.Read(uuid)
 
-	assert.NoError(err, "Error finding subject for uuid %s", uuid)
-	assert.True(found, "Didn't find subject for uuid %s", uuid)
-	assert.Equal(expectedSubject, storedSubject, "subjects should be the same")
+	assert.NoError(err, "Error finding series for uuid %s", uuid)
+	assert.True(found, "Didn't find series for uuid %s", uuid)
+	assert.Equal(expectedSeries, storedSeries, "series should be the same")
 }
 
 func TestWritePrefLabelIsAlsoWrittenAndIsEqualToName(t *testing.T) {
 	assert := assert.New(t)
-	subjectsDriver := getSubjectsCypherDriver(t)
+	seriesDriver := getSeriesCypherDriver(t)
 	uuid := "12345"
-	subjectToWrite := Subject{UUID: uuid, CanonicalName: "Test", TmeIdentifier: "TME_ID"}
+	seriesToWrite := Series{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(subjectsDriver.Write(subjectToWrite), "Failed to write subject")
+	assert.NoError(seriesDriver.Write(seriesToWrite), "Failed to write series")
 
 	result := []struct {
 		PrefLabel string `json:"t.prefLabel"`
@@ -135,12 +135,12 @@ func TestWritePrefLabelIsAlsoWrittenAndIsEqualToName(t *testing.T) {
 
 	getPrefLabelQuery := &neoism.CypherQuery{
 		Statement: `
-				MATCH (t:Subject {uuid:"12345"}) RETURN t.prefLabel
+				MATCH (t:Series {uuid:"12345"}) RETURN t.prefLabel
 				`,
 		Result: &result,
 	}
 
-	err := subjectsDriver.cypherRunner.CypherBatch([]*neoism.CypherQuery{getPrefLabelQuery})
+	err := seriesDriver.cypherRunner.CypherBatch([]*neoism.CypherQuery{getPrefLabelQuery})
 	assert.NoError(err)
 	assert.Equal("Test", result[0].PrefLabel, "PrefLabel should be 'Test")
 	cleanUp(t, uuid)
@@ -148,7 +148,7 @@ func TestWritePrefLabelIsAlsoWrittenAndIsEqualToName(t *testing.T) {
 
 func cleanUp(t *testing.T, uuid string) {
 	assert := assert.New(t)
-	found, err := subjectsDriver.Delete(uuid)
-	assert.True(found, "Didn't manage to delete subject for uuid %", uuid)
-	assert.NoError(err, "Error deleting subject for uuid %s", uuid)
+	found, err := seriesDriver.Delete(uuid)
+	assert.True(found, "Didn't manage to delete series for uuid %", uuid)
+	assert.NoError(err, "Error deleting series for uuid %s", uuid)
 }

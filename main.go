@@ -8,7 +8,7 @@ import (
 	"github.com/Financial-Times/base-ft-rw-app-go/baseftrwapp"
 	"github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/Financial-Times/neo-utils-go/neoutils"
-	"github.com/Financial-Times/subjects-rw-neo4j/subjects"
+	"github.com/Financial-Times/series-rw-neo4j/series"
 	log "github.com/Sirupsen/logrus"
 	"github.com/jawher/mow.cli"
 	"github.com/jmcvetta/neoism"
@@ -64,12 +64,12 @@ func main() {
 		}
 
 		batchRunner := neoutils.NewBatchCypherRunner(neoutils.StringerDb{db}, *batchSize)
-		subjectsDriver := subjects.NewCypherSubjectsService(batchRunner, db)
+		seriesDriver := series.NewCypherSeriesService(batchRunner, db)
 
 		baseftrwapp.OutputMetricsIfRequired(*graphiteTCPAddress, *graphitePrefix, *logMetrics)
 
 		endpoints := map[string]baseftrwapp.Service{
-			"subjects": subjectsDriver,
+			"series": seriesDriver,
 		}
 
 		var checks []v1a.Check
@@ -78,8 +78,8 @@ func main() {
 		}
 
 		baseftrwapp.RunServer(endpoints,
-			v1a.Handler("ft-subjects_rw_neo4j ServiceModule", "Writes 'subjects' to Neo4j, usually as part of a bulk upload done on a schedule", checks...),
-			*port, "subjects-rw-neo4j", "local")
+			v1a.Handler("ft-series_rw_neo4j ServiceModule", "Writes 'series' to Neo4j, usually as part of a bulk upload done on a schedule", checks...),
+			*port, "series-rw-neo4j", "local")
 	}
 
 	app.Run(os.Args)
@@ -87,7 +87,7 @@ func main() {
 
 func makeCheck(service baseftrwapp.Service, cr neoutils.CypherRunner) v1a.Check {
 	return v1a.Check{
-		BusinessImpact:   "Cannot read/write subjects via this writer",
+		BusinessImpact:   "Cannot read/write series via this writer",
 		Name:             "Check connectivity to Neo4j - neoUrl is a parameter in hieradata for this service",
 		PanicGuide:       "TODO - write panic guide",
 		Severity:         1,

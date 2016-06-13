@@ -12,9 +12,9 @@ type service struct {
 	indexManager neoutils.IndexManager
 }
 
-// NewCypherSubjectsService provides functions for create, update, delete operations on subjects in Neo4j,
+// NewCypherSeriesService provides functions for create, update, delete operations on series in Neo4j,
 // plus other utility functions needed for a service
-func NewCypherSubjectsService(cypherRunner neoutils.CypherRunner, indexManager neoutils.IndexManager) service {
+func NewCypherSeriesService(cypherRunner neoutils.CypherRunner, indexManager neoutils.IndexManager) service {
 	return service{cypherRunner, indexManager}
 }
 
@@ -23,15 +23,16 @@ func (s service) Initialise() error {
 		"Thing":          "uuid",
 		"Concept":        "uuid",
 		"Classification": "uuid",
-		"Subject":        "uuid"})
+		"Series":         "uuid"})
 }
 
 func (s service) Read(uuid string) (interface{}, bool, error) {
-	results := []Subject{}
+	results := []Series{}
 
 	query := &neoism.CypherQuery{
-		Statement: `MATCH (n:Subject {uuid:{uuid}}) return n.uuid
-		as uuid, n.canonicalName as canonicalName,
+		Statement: `MATCH (n:Series {uuid:{uuid}}) return n.uuid as uuid,
+		n.prefLabel as prefLabel,
+		n.description as description,
 		n.tmeIdentifier as tmeIdentifier`,
 		Parameters: map[string]interface{}{
 			"uuid": uuid,
@@ -42,11 +43,11 @@ func (s service) Read(uuid string) (interface{}, bool, error) {
 	err := s.cypherRunner.CypherBatch([]*neoism.CypherQuery{query})
 
 	if err != nil {
-		return Subject{}, false, err
+		return Series{}, false, err
 	}
 
 	if len(results) == 0 {
-		return Subject{}, false, nil
+		return Series{}, false, nil
 	}
 
 	return results[0], true, nil
@@ -54,19 +55,18 @@ func (s service) Read(uuid string) (interface{}, bool, error) {
 
 func (s service) Write(thing interface{}) error {
 
-	sub := thing.(Subject)
+	series := thing.(Series)
 
 	params := map[string]interface{}{
-		"uuid": sub.UUID,
+		"uuid": series.UUID,
 	}
 
-	if sub.CanonicalName != "" {
-		params["canonicalName"] = sub.CanonicalName
-		params["prefLabel"] = sub.CanonicalName
+	if series.PrefLabel != "" {
+		params["prefLabel"] = series.PrefLabel
 	}
 
-	if sub.TmeIdentifier != "" {
-		params["tmeIdentifier"] = sub.TmeIdentifier
+	if series.TmeIdentifier != "" {
+		params["tmeIdentifier"] = series.TmeIdentifier
 	}
 
 	query := &neoism.CypherQuery{
@@ -74,16 +74,15 @@ func (s service) Write(thing interface{}) error {
 					set n={allprops}
 					set n :Concept
 					set n :Classification
-					set n :Subject
+					set n :Series
 		`,
 		Parameters: map[string]interface{}{
-			"uuid":     sub.UUID,
+			"uuid":     series.UUID,
 			"allprops": params,
 		},
 	}
 
 	return s.cypherRunner.CypherBatch([]*neoism.CypherQuery{query})
-
 }
 
 func (s service) Delete(uuid string) (bool, error) {
@@ -92,7 +91,7 @@ func (s service) Delete(uuid string) (bool, error) {
 			MATCH (s:Thing {uuid: {uuid}})
 			REMOVE s:Concept
 			REMOVE s:Classification
-			REMOVE s:Subject
+			REMOVE s:Series
 			SET s={props}
 		`,
 		Parameters: map[string]interface{}{
@@ -133,9 +132,9 @@ func (s service) Delete(uuid string) (bool, error) {
 }
 
 func (s service) DecodeJSON(dec *json.Decoder) (interface{}, string, error) {
-	sub := Subject{}
-	err := dec.Decode(&sub)
-	return sub, sub.UUID, err
+	series := Series{}
+	err := dec.Decode(&series)
+	return series, series.UUID, err
 }
 
 func (s service) Check() error {
@@ -143,13 +142,12 @@ func (s service) Check() error {
 }
 
 func (s service) Count() (int, error) {
-
 	results := []struct {
 		Count int `json:"c"`
 	}{}
 
 	query := &neoism.CypherQuery{
-		Statement: `MATCH (n:Subject) return count(n) as c`,
+		Statement: `MATCH (n:Series) return count(n) as c`,
 		Result:    &results,
 	}
 
