@@ -14,4 +14,4 @@ Series R/W is tested and built using CircleCI. Git releases are automatically pi
 
 ## Usage
 
-See `./series-rw-neo4j --help` for command line properties and details. 
+See `./series-rw-neo4j --help` for command line properties and details.
