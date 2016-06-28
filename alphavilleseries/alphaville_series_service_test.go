@@ -20,17 +20,17 @@ func TestDelete(t *testing.T) {
 
 	alphavilleSeriesToDelete := AlphavilleSeries{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToDelete), "Failed to write alphavilleSeries")
+	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToDelete), "Failed to write Alphaville Series")
 
 	found, err := alphavilleSeriesDriver.Delete(uuid)
-	assert.True(found, "Didn't manage to delete alphavilleSeries for uuid %", uuid)
-	assert.NoError(err, "Error deleting alphavilleSeries for uuid %s", uuid)
+	assert.True(found, "Didn't manage to delete Alphaville Series for uuid %s", uuid)
+	assert.NoError(err, "Error deleting Alphaville Series for uuid %s", uuid)
 
 	p, found, err := alphavilleSeriesDriver.Read(uuid)
 
-	assert.Equal(AlphavilleSeries{}, p, "Found alphavilleSeries %s who should have been deleted", p)
-	assert.False(found, "Found alphavilleSeries for uuid %s who should have been deleted", uuid)
-	assert.NoError(err, "Error trying to find alphavilleSeries for uuid %s", uuid)
+	assert.Equal(AlphavilleSeries{}, p, "Found Alphaville Series %s which should have been deleted", p)
+	assert.False(found, "Found Alphaville Series for uuid %s which should have been deleted", uuid)
+	assert.NoError(err, "Error trying to find Alphaville Series for uuid %s", uuid)
 }
 
 func TestCreateAllValuesPresent(t *testing.T) {
@@ -40,7 +40,7 @@ func TestCreateAllValuesPresent(t *testing.T) {
 
 	alphavilleSeriesToWrite := AlphavilleSeries{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write alphavilleSeries")
+	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write Alphaville Series")
 
 	readAlphavilleSeriesForUUIDAndCheckFieldsMatch(t, uuid, alphavilleSeriesToWrite)
 
@@ -54,7 +54,7 @@ func TestCreateHandlesSpecialCharacters(t *testing.T) {
 
 	alphavilleSeriesToWrite := AlphavilleSeries{UUID: uuid, PrefLabel: "Test 'special chars", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write alphavilleSeries")
+	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write Alphaville Series")
 
 	readAlphavilleSeriesForUUIDAndCheckFieldsMatch(t, uuid, alphavilleSeriesToWrite)
 
@@ -68,7 +68,7 @@ func TestCreateNotAllValuesPresent(t *testing.T) {
 
 	alphavilleSeriesToWrite := AlphavilleSeries{UUID: uuid, PrefLabel: "Test"}
 
-	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write alphavilleSeries")
+	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write Alphaville Series")
 
 	readAlphavilleSeriesForUUIDAndCheckFieldsMatch(t, uuid, alphavilleSeriesToWrite)
 
@@ -82,12 +82,12 @@ func TestUpdateWillRemovePropertiesNoLongerPresent(t *testing.T) {
 
 	alphavilleSeriesToWrite := AlphavilleSeries{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write alphavilleSeries")
+	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write Alphaville Series")
 	readAlphavilleSeriesForUUIDAndCheckFieldsMatch(t, uuid, alphavilleSeriesToWrite)
 
 	updatedAlphavilleSeries := AlphavilleSeries{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(alphavilleSeriesDriver.Write(updatedAlphavilleSeries), "Failed to write updated alphavilleSeries")
+	assert.NoError(alphavilleSeriesDriver.Write(updatedAlphavilleSeries), "Failed to write updated Alphaville Series")
 	readAlphavilleSeriesForUUIDAndCheckFieldsMatch(t, uuid, updatedAlphavilleSeries)
 
 	cleanUp(t, uuid)
@@ -116,9 +116,9 @@ func readAlphavilleSeriesForUUIDAndCheckFieldsMatch(t *testing.T, uuid string, e
 	assert := assert.New(t)
 	storedAlphavilleSeries, found, err := alphavilleSeriesDriver.Read(uuid)
 
-	assert.NoError(err, "Error finding alphavilleSeries for uuid %s", uuid)
-	assert.True(found, "Didn't find alphavilleSeries for uuid %s", uuid)
-	assert.Equal(expectedAlphavilleSeries, storedAlphavilleSeries, "alphavilleSeries should be the same")
+	assert.NoError(err, "Error finding Alphaville Series for uuid %s", uuid)
+	assert.True(found, "Didn't find Alphaville Series for uuid %s", uuid)
+	assert.Equal(expectedAlphavilleSeries, storedAlphavilleSeries, "Alphaville Series should be the same")
 }
 
 func TestWritePrefLabelIsAlsoWrittenAndIsEqualToName(t *testing.T) {
@@ -127,7 +127,7 @@ func TestWritePrefLabelIsAlsoWrittenAndIsEqualToName(t *testing.T) {
 	uuid := "12345"
 	alphavilleSeriesToWrite := AlphavilleSeries{UUID: uuid, PrefLabel: "Test", TmeIdentifier: "TME_ID"}
 
-	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write alphavilleSeries")
+	assert.NoError(alphavilleSeriesDriver.Write(alphavilleSeriesToWrite), "Failed to write Alphaville Series")
 
 	result := []struct {
 		PrefLabel string `json:"t.prefLabel"`
@@ -149,6 +149,6 @@ func TestWritePrefLabelIsAlsoWrittenAndIsEqualToName(t *testing.T) {
 func cleanUp(t *testing.T, uuid string) {
 	assert := assert.New(t)
 	found, err := alphavilleSeriesDriver.Delete(uuid)
-	assert.True(found, "Didn't manage to delete alphavilleSeries for uuid %", uuid)
-	assert.NoError(err, "Error deleting alphavilleSeries for uuid %s", uuid)
+	assert.True(found, "Didn't manage to delete Alphaville Series for uuid %s", uuid)
+	assert.NoError(err, "Error deleting Alphaville Series for uuid %s", uuid)
 }
