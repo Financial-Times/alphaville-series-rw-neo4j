@@ -1,4 +1,4 @@
-package series
+package alphavilleseries
 
 import (
 	"encoding/json"
@@ -12,25 +12,25 @@ type service struct {
 	indexManager neoutils.IndexManager
 }
 
-// NewCypherSeriesService provides functions for create, update, delete operations on series in Neo4j,
+// NewCypherAlphavilleSeriesService provides functions for create, update, delete operations on alphavilleSeries in Neo4j,
 // plus other utility functions needed for a service
-func NewCypherSeriesService(cypherRunner neoutils.CypherRunner, indexManager neoutils.IndexManager) service {
+func NewCypherAlphavilleSeriesService(cypherRunner neoutils.CypherRunner, indexManager neoutils.IndexManager) service {
 	return service{cypherRunner, indexManager}
 }
 
 func (s service) Initialise() error {
 	return neoutils.EnsureConstraints(s.indexManager, map[string]string{
-		"Thing":          "uuid",
-		"Concept":        "uuid",
-		"Classification": "uuid",
-		"Series":         "uuid"})
+		"Thing":            "uuid",
+		"Concept":          "uuid",
+		"Classification":   "uuid",
+		"AlphavilleSeries": "uuid"})
 }
 
 func (s service) Read(uuid string) (interface{}, bool, error) {
-	results := []Series{}
+	results := []AlphavilleSeries{}
 
 	query := &neoism.CypherQuery{
-		Statement: `MATCH (n:Series {uuid:{uuid}}) return n.uuid as uuid,
+		Statement: `MATCH (n:AlphavilleSeries {uuid:{uuid}}) return n.uuid as uuid,
 		n.prefLabel as prefLabel,
 		n.description as description,
 		n.tmeIdentifier as tmeIdentifier`,
@@ -43,11 +43,11 @@ func (s service) Read(uuid string) (interface{}, bool, error) {
 	err := s.cypherRunner.CypherBatch([]*neoism.CypherQuery{query})
 
 	if err != nil {
-		return Series{}, false, err
+		return AlphavilleSeries{}, false, err
 	}
 
 	if len(results) == 0 {
-		return Series{}, false, nil
+		return AlphavilleSeries{}, false, nil
 	}
 
 	return results[0], true, nil
@@ -55,18 +55,18 @@ func (s service) Read(uuid string) (interface{}, bool, error) {
 
 func (s service) Write(thing interface{}) error {
 
-	series := thing.(Series)
+	alphavilleSeries := thing.(AlphavilleSeries)
 
 	params := map[string]interface{}{
-		"uuid": series.UUID,
+		"uuid": alphavilleSeries.UUID,
 	}
 
-	if series.PrefLabel != "" {
-		params["prefLabel"] = series.PrefLabel
+	if alphavilleSeries.PrefLabel != "" {
+		params["prefLabel"] = alphavilleSeries.PrefLabel
 	}
 
-	if series.TmeIdentifier != "" {
-		params["tmeIdentifier"] = series.TmeIdentifier
+	if alphavilleSeries.TmeIdentifier != "" {
+		params["tmeIdentifier"] = alphavilleSeries.TmeIdentifier
 	}
 
 	query := &neoism.CypherQuery{
@@ -74,10 +74,10 @@ func (s service) Write(thing interface{}) error {
 					set n={allprops}
 					set n :Concept
 					set n :Classification
-					set n :Series
+					set n :AlphavilleSeries
 		`,
 		Parameters: map[string]interface{}{
-			"uuid":     series.UUID,
+			"uuid":     alphavilleSeries.UUID,
 			"allprops": params,
 		},
 	}
@@ -91,7 +91,7 @@ func (s service) Delete(uuid string) (bool, error) {
 			MATCH (s:Thing {uuid: {uuid}})
 			REMOVE s:Concept
 			REMOVE s:Classification
-			REMOVE s:Series
+			REMOVE s:AlphavilleSeries
 			SET s={props}
 		`,
 		Parameters: map[string]interface{}{
@@ -132,9 +132,9 @@ func (s service) Delete(uuid string) (bool, error) {
 }
 
 func (s service) DecodeJSON(dec *json.Decoder) (interface{}, string, error) {
-	series := Series{}
-	err := dec.Decode(&series)
-	return series, series.UUID, err
+	alphavilleSeries := AlphavilleSeries{}
+	err := dec.Decode(&alphavilleSeries)
+	return alphavilleSeries, alphavilleSeries.UUID, err
 }
 
 func (s service) Check() error {
@@ -147,7 +147,7 @@ func (s service) Count() (int, error) {
 	}{}
 
 	query := &neoism.CypherQuery{
-		Statement: `MATCH (n:Series) return count(n) as c`,
+		Statement: `MATCH (n:AlphavilleSeries) return count(n) as c`,
 		Result:    &results,
 	}
 

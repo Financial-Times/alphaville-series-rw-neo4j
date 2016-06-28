@@ -1,20 +1,20 @@
 
 FROM alpine:3.3
 
-ADD *.go /series-rw-neo4j/
-ADD subjects/*.go /series-rw-neo4j/series/
+ADD *.go /alphaville-series-rw-neo4j/
+ADD alphaville-series/*.go /alphaville-series-rw-neo4j/alphavilleseries/
 
 RUN apk add --update bash \
   && apk --update add git bzr \
   && apk --update add go \
   && export GOPATH=/gopath \
-  && REPO_PATH="github.com/Financial-Times/series-rw-neo4j" \
+  && REPO_PATH="github.com/Financial-Times/alphaville-series-rw-neo4j" \
   && mkdir -p $GOPATH/src/${REPO_PATH} \
-  && mv series-rw-neo4j/* $GOPATH/src/${REPO_PATH} \
+  && mv alphaville-series-rw-neo4j/* $GOPATH/src/${REPO_PATH} \
   && cd $GOPATH/src/${REPO_PATH} \
   && go get -t ./... \
   && go build \
-  && mv series-rw-neo4j /app \
+  && mv alphaville-series-rw-neo4j /app \
   && apk del go git bzr \
   && rm -rf $GOPATH /var/cache/apk/*
 

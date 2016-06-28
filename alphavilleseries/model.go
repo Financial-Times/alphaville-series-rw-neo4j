@@ -1,7 +1,7 @@
-package series
+package alphavilleseries
 
-// Series json data
-type Series struct {
+// AlphavilleSeries json data
+type AlphavilleSeries struct {
 	UUID          string `json:"uuid"`
 	Description   string `json:"description,omitempty"`
 	PrefLabel     string `json:"prefLabel"`
