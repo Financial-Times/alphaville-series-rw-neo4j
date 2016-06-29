@@ -111,7 +111,7 @@ func TestDelete(t *testing.T) {
 	assert.NoError(seriesDriver.Write(seriesToDelete), "Failed to write series")
 
 	found, err := seriesDriver.Delete(seriesUUID)
-	assert.True(found, "Didn't manage to delete series for uuid %", seriesUUID)
+	assert.True(found, "Didn't manage to delete series for uuid %s", seriesUUID)
 	assert.NoError(err, "Error deleting series for uuid %s", seriesUUID)
 
 	p, found, err := seriesDriver.Read(seriesUUID)
@@ -170,6 +170,6 @@ func getAlphavilleSeriesCypherDriver(t *testing.T) service {
 
 func cleanUp(assert *assert.Assertions, uuid string, seriesDriver service) {
 	found, err := seriesDriver.Delete(uuid)
-	assert.True(found, "Didn't manage to delete series for uuid %", uuid)
+	assert.True(found, "Didn't manage to delete series for uuid %s", uuid)
 	assert.NoError(err, "Error deleting series for uuid %s", uuid)
 }
