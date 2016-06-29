@@ -19,7 +19,7 @@ func init() {
 }
 
 func main() {
-	app := cli.App("alphaville-series-rw-neo4j", "A RESTful API for managing Alphaville Series in neo4j")
+	app := cli.App("subjetcs-rw-neo4j", "A RESTful API for managing Sections in neo4j")
 	neoURL := app.String(cli.StringOpt{
 		Name:   "neo-url",
 		Value:  "http://localhost:7474/db/data",
@@ -29,13 +29,13 @@ func main() {
 	graphiteTCPAddress := app.String(cli.StringOpt{
 		Name:   "graphite-tcp-address",
 		Value:  "",
-		Desc:   "Graphite TCP address, e.g. graphite.ft.com:2003. Leave as default if you do NOT want to output to graphite (e.g. if running locally",
+		Desc:   "Graphite TCP address, e.g. graphite.ft.com:2003. Leave as default if you do NOT want to output to graphite (e.g. if running locally)",
 		EnvVar: "GRAPHITE_TCP_ADDRESS",
 	})
 	graphitePrefix := app.String(cli.StringOpt{
 		Name:   "graphite-prefix",
 		Value:  "",
-		Desc:   "Prefix to use. Should start with content, include the environment, and the host name. e.g. coco.pre-prod.subjects-rw-neo4j.1",
+		Desc:   "Prefix to use. Should start with content, include the environment, and the host name. e.g. coco.pre-prod.alphaville-series-rw-neo4j.1",
 		EnvVar: "GRAPHITE_PREFIX",
 	})
 	port := app.Int(cli.IntOpt{
@@ -69,7 +69,7 @@ func main() {
 		baseftrwapp.OutputMetricsIfRequired(*graphiteTCPAddress, *graphitePrefix, *logMetrics)
 
 		endpoints := map[string]baseftrwapp.Service{
-			"alphavilleseries": alphavilleSeriesDriver,
+			"alphavilleSeriesDriver": alphavilleSeriesDriver,
 		}
 
 		var checks []v1a.Check
@@ -78,7 +78,7 @@ func main() {
 		}
 
 		baseftrwapp.RunServer(endpoints,
-			v1a.Handler("ft-alphaville-series_rw_neo4j ServiceModule", "Writes 'alphaville series' data to Neo4j, usually as part of a bulk upload done on a schedule", checks...),
+			v1a.Handler("ft-alphaville-series_rw_neo4j ServiceModule", "Writes 'AlphavilleSeries' to Neo4j, usually as part of a bulk upload done on a schedule", checks...),
 			*port, "alphaville-series-rw-neo4j", "local")
 	}
 
@@ -87,11 +87,11 @@ func main() {
 
 func makeCheck(service baseftrwapp.Service, cr neoutils.CypherRunner) v1a.Check {
 	return v1a.Check{
-		BusinessImpact:   "Cannot read/write series via this writer",
+		BusinessImpact:   "Cannot read/write alphaville-series via this writer",
 		Name:             "Check connectivity to Neo4j - neoUrl is a parameter in hieradata for this service",
 		PanicGuide:       "TODO - write panic guide",
 		Severity:         1,
-		TechnicalSummary: fmt.Sprintf("Cannot connect to Neo4j instance %s with at least one subject loaded in it", cr),
+		TechnicalSummary: fmt.Sprintf("Cannot connect to Neo4j instance %s with at least one section loaded in it", cr),
 		Checker:          func() (string, error) { return "", service.Check() },
 	}
 }

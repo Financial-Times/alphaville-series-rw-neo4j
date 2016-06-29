@@ -1,10 +1,22 @@
 package alphavilleseries
 
-// AlphavilleSeries json data
 type AlphavilleSeries struct {
-	UUID          string `json:"uuid"`
-	Description   string `json:"description,omitempty"`
-	PrefLabel     string `json:"prefLabel"`
-	TmeIdentifier string `json:"tmeIdentifier,omitempty"`
-	Type          string `json:"type,omitempty"`
+	UUID                   string                 `json:"uuid"`
+	PrefLabel              string                 `json:"prefLabel"`
+	AlternativeIdentifiers alternativeIdentifiers `json:"alternativeIdentifiers"`
+	Types                  []string               `json:"types,omitempty"`
+}
+
+type alternativeIdentifiers struct {
+	TME   []string `json:"TME,omitempty"`
+	UUIDS []string `json:"uuids"`
+}
+
+const (
+	tmeIdentifierLabel = "TMEIdentifier"
+	uppIdentifierLabel = "UPPIdentifier"
+)
+
+type AlphavilleSeriesLink struct {
+	ApiUrl string `json:"apiUrl"`
 }
