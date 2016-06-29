@@ -2,7 +2,7 @@
 FROM alpine:3.3
 
 ADD *.go /alphaville-series-rw-neo4j/
-ADD alphaville-series/*.go /alphaville-series-rw-neo4j/alphavilleseries/
+ADD alphavilleseries/*.go /alphaville-series-rw-neo4j/alphavilleseries/
 
 RUN apk add --update bash \
   && apk --update add git bzr \
