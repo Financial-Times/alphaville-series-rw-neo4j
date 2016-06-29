@@ -5,10 +5,10 @@ import (
 	_ "net/http/pprof"
 	"os"
 
+	"github.com/Financial-Times/alphaville-series-rw-neo4j/alphavilleseries"
 	"github.com/Financial-Times/base-ft-rw-app-go/baseftrwapp"
 	"github.com/Financial-Times/go-fthealth/v1a"
 	"github.com/Financial-Times/neo-utils-go/neoutils"
-	"github.com/Financial-Times/series-rw-neo4j/series"
 	log "github.com/Sirupsen/logrus"
 	"github.com/jawher/mow.cli"
 	"github.com/jmcvetta/neoism"
@@ -19,7 +19,7 @@ func init() {
 }
 
 func main() {
-	app := cli.App("series-rw-neo4j", "A RESTful API for managing Series in neo4j")
+	app := cli.App("alphaville-series-rw-neo4j", "A RESTful API for managing Alphaville Series in neo4j")
 	neoURL := app.String(cli.StringOpt{
 		Name:   "neo-url",
 		Value:  "http://localhost:7474/db/data",
@@ -64,12 +64,12 @@ func main() {
 		}
 
 		batchRunner := neoutils.NewBatchCypherRunner(neoutils.StringerDb{db}, *batchSize)
-		seriesDriver := series.NewCypherSeriesService(batchRunner, db)
+		alphavilleSeriesDriver := alphavilleseries.NewCypherAlphavilleSeriesService(batchRunner, db)
 
 		baseftrwapp.OutputMetricsIfRequired(*graphiteTCPAddress, *graphitePrefix, *logMetrics)
 
 		endpoints := map[string]baseftrwapp.Service{
-			"series": seriesDriver,
+			"alphavilleseries": alphavilleSeriesDriver,
 		}
 
 		var checks []v1a.Check
@@ -78,8 +78,8 @@ func main() {
 		}
 
 		baseftrwapp.RunServer(endpoints,
-			v1a.Handler("ft-series_rw_neo4j ServiceModule", "Writes 'series' to Neo4j, usually as part of a bulk upload done on a schedule", checks...),
-			*port, "series-rw-neo4j", "local")
+			v1a.Handler("ft-alphaville-series_rw_neo4j ServiceModule", "Writes 'alphaville series' data to Neo4j, usually as part of a bulk upload done on a schedule", checks...),
+			*port, "alphaville-series-rw-neo4j", "local")
 	}
 
 	app.Run(os.Args)
