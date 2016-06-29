@@ -69,7 +69,7 @@ func main() {
 		baseftrwapp.OutputMetricsIfRequired(*graphiteTCPAddress, *graphitePrefix, *logMetrics)
 
 		endpoints := map[string]baseftrwapp.Service{
-			"alphavilleSeriesDriver": alphavilleSeriesDriver,
+			"alphavilleseries": alphavilleSeriesDriver,
 		}
 
 		var checks []v1a.Check
