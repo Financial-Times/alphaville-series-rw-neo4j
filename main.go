@@ -91,7 +91,7 @@ func makeCheck(service baseftrwapp.Service, cr neoutils.CypherRunner) v1a.Check 
 		Name:             "Check connectivity to Neo4j - neoUrl is a parameter in hieradata for this service",
 		PanicGuide:       "TODO - write panic guide",
 		Severity:         1,
-		TechnicalSummary: fmt.Sprintf("Cannot connect to Neo4j instance %s with at least one section loaded in it", cr),
+		TechnicalSummary: fmt.Sprintf("Cannot connect to Neo4j instance %s with at least one series loaded in it", cr),
 		Checker:          func() (string, error) { return "", service.Check() },
 	}
 }

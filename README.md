@@ -42,7 +42,7 @@ NB: the default batchSize is much higher than the throughput the instance data i
 ### PUT
 "The only mandatory fields are the uuid, the prefLabel and the alternativeIdentifier uuids (because the uuid is also listed in the alternativeIdentifier uuids list)."
 
-Every request results in an attempt to update that section: unlike with GraphDB there is no check on whether the section already exists and whether there are any changes between what's there and what's being written. We just do a MERGE which is Neo4j for create if not there, update if it is there.
+Every request results in an attempt to update that series: unlike with GraphDB there is no check on whether the series already exists and whether there are any changes between what's there and what's being written. We just do a MERGE which is Neo4j for create if not there, update if it is there.
 
 A successful PUT results in 200.
 
