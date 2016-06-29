@@ -34,8 +34,6 @@ With Docker:
 
 All arguments are optional, they default to a local Neo4j install on the default port (7474), application running on port 8080, batchSize of 1024, graphiteTCPAddress of "" (meaning metrics won't be written to Graphite), graphitePrefix of "" and logMetrics false.
 
-NB: the default batchSize is much higher than the throughput the instance data ingester currently can cope with.
-
 ## Endpoints
 /alphavilleseries/{uuid}
 
