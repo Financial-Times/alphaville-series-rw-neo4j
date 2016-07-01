@@ -101,7 +101,6 @@ func (s service) Write(thing interface{}) error {
 	}
 
 	return s.cypherRunner.CypherBatch(queryBatch)
-
 }
 
 func createNewIdentifierQuery(uuid string, identifierLabel string, identifierValue string) *neoism.CypherQuery {

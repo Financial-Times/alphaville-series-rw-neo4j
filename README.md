@@ -38,7 +38,10 @@ All arguments are optional, they default to a local Neo4j install on the default
 /alphavilleseries/{uuid}
 
 ### PUT
-"The only mandatory fields are the uuid, the prefLabel and the alternativeIdentifier uuids (because the uuid is also listed in the alternativeIdentifier uuids list)."
+
+The only mandatory fields are the uuid, the prefLabel and the alternativeIdentifier uuids (because the uuid is also listed in the alternativeIdentifier uuids list).
+
+*N.B.* The fields are mandatory, but the request data is not validated, apart from a check that the PUT url matches the body uuid. All other data can be blank or missing.
 
 Every request results in an attempt to update that series: unlike with GraphDB there is no check on whether the series already exists and whether there are any changes between what's there and what's being written. We just do a MERGE which is Neo4j for create if not there, update if it is there.
 
