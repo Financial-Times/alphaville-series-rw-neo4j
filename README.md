@@ -69,3 +69,12 @@ Will return 204 if successful, 404 if not found
 Healthchecks: [http://localhost:8080/__health](http://localhost:8080/__health)
 
 Ping: [http://localhost:8080/ping](http://localhost:8080/ping) or [http://localhost:8080/__ping](http://localhost:8080/__ping)
+
+### Caveat
+When you test integration with concept-ingester outside clustered container environment, e.g. your local machine,
+the workaround is to use `localhost:{--port}/__alphaville-series-rw-neo4j/alphavilleseries/` 
+instead of `localhost:8080/alphavilleseries/`.
+
+This is because you are not likely to have Vulkan to resolve hosts ports and paths in your local environment.
+#### Running in your local environment
+alphaville-series-rw-neo4j --port=XXXX

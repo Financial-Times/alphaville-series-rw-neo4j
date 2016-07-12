@@ -150,10 +150,11 @@ func TestCount(t *testing.T) {
 func readAlphavilleSeriesForUUIDAndCheckFieldsMatch(assert *assert.Assertions, seriesDriver service, uuid string, expectedAlphavilleSeries AlphavilleSeries) {
 
 	storedAlphavilleSeries, found, err := seriesDriver.Read(uuid)
-
 	assert.NoError(err, "Error finding series for uuid %s", uuid)
 	assert.True(found, "Didn't find series for uuid %s", uuid)
-	assert.Equal(expectedAlphavilleSeries, storedAlphavilleSeries, "series should be the same")
+	assert.Equal(expectedAlphavilleSeries.PrefLabel, storedAlphavilleSeries.(AlphavilleSeries).PrefLabel, "PerfLable didn't match")
+	assert.Equal(expectedAlphavilleSeries.AlternativeIdentifiers, storedAlphavilleSeries.(AlphavilleSeries).AlternativeIdentifiers, "AlternativeIdentifiers didn't match")
+	assert.True(arraysEqual(expectedAlphavilleSeries.Types, storedAlphavilleSeries.(AlphavilleSeries).Types), "Types should be the same")
 }
 
 func getAlphavilleSeriesCypherDriver(t *testing.T) service {
@@ -172,4 +173,29 @@ func cleanUp(assert *assert.Assertions, uuid string, seriesDriver service) {
 	found, err := seriesDriver.Delete(uuid)
 	assert.True(found, "Didn't manage to delete series for uuid %s", uuid)
 	assert.NoError(err, "Error deleting series for uuid %s", uuid)
+}
+
+func TestArraysEqual(t *testing.T) {
+	x := []string{"1", "2"}
+	y := []string{"2", "1"}
+
+	assert := assert.New(t)
+	assert.True(arraysEqual(x, y), "Arrays were equial but evaluated as not equal")
+}
+
+func arraysEqual(x []string, y[]string) bool {
+	if len(x) != len(y) {
+		return false
+	}
+	m := make(map[string]int)
+
+	for _, x_value := range x {
+		m[x_value]++
+	}
+	for _, y_value := range y {
+		if m[y_value] == 0 {
+			return false
+		}
+	}
+	return true
 }
