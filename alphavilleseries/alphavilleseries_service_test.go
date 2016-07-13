@@ -154,7 +154,7 @@ func readAlphavilleSeriesForUUIDAndCheckFieldsMatch(assert *assert.Assertions, s
 	assert.True(found, "Didn't find series for uuid %s", uuid)
 	assert.Equal(expectedAlphavilleSeries.PrefLabel, storedAlphavilleSeries.(AlphavilleSeries).PrefLabel, "PerfLable didn't match")
 	assert.Equal(expectedAlphavilleSeries.AlternativeIdentifiers, storedAlphavilleSeries.(AlphavilleSeries).AlternativeIdentifiers, "AlternativeIdentifiers didn't match")
-	assert.True(arraysEqual(expectedAlphavilleSeries.Types, storedAlphavilleSeries.(AlphavilleSeries).Types), "Types should be the same")
+	assert.True(sameSetOfValues(expectedAlphavilleSeries.Types, storedAlphavilleSeries.(AlphavilleSeries).Types), "Types should be the same")
 }
 
 func getAlphavilleSeriesCypherDriver(t *testing.T) service {
@@ -175,15 +175,15 @@ func cleanUp(assert *assert.Assertions, uuid string, seriesDriver service) {
 	assert.NoError(err, "Error deleting series for uuid %s", uuid)
 }
 
-func TestArraysEqual(t *testing.T) {
+func TestSameSetOfValues(t *testing.T) {
 	x := []string{"1", "2"}
 	y := []string{"2", "1"}
 
 	assert := assert.New(t)
-	assert.True(arraysEqual(x, y), "Arrays were equial but evaluated as not equal")
+	assert.True(sameSetOfValues(x, y), "Arrays were equial but evaluated as not equal")
 }
 
-func arraysEqual(x []string, y[]string) bool {
+func sameSetOfValues(x []string, y[]string) bool {
 	if len(x) != len(y) {
 		return false
 	}
