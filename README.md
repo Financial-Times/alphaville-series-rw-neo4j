@@ -49,7 +49,7 @@ We run queries in batches. If a batch fails, all failing requests will get a 500
 Invalid json body input, or uuids that don't match between the path and the body will result in a 400 bad request response.
 
 Example:
-`curl -XPUT -H "X-Request-Id: 123" -H "Content-Type: application/json" localhost:8080/alphavilleseries/bba39990-c78d-3629-ae83-808c333c6dbc --data '{"uuid":"bba39990-c78d-3629-ae83-808c333c6dbc","prefLabel":"Metals Markets", "alternativeIdentifiers":{"TME":["MTE3-U3ViamVjdHM="],"uuids": ["bba39990-c78d-3629-ae83-808c333c6dbc","6a2a0170-6afa-4bcc-b427-430268d2ac50"],"type":"AlphavilleSeries"}}'`
+`curl -XPUT -H "X-Request-Id: 123" -H "Content-Type: application/json" localhost:8080/alphaville-series/bba39990-c78d-3629-ae83-808c333c6dbc --data '{"uuid":"bba39990-c78d-3629-ae83-808c333c6dbc","prefLabel":"Metals Markets", "type":"AlphavilleSeries", "alternativeIdentifiers":{"TME":["MTE3-U3ViamVjdHM="], "uuids": ["bba39990-c78d-3629-ae83-808c333c6dbc","6a2a0170-6afa-4bcc-b427-430268d2ac50"]}}'`
 
 The type field is not currently validated - instead, the AlphavilleSeries Writer writes type AlphavilleSeries and its parent types (Thing, Concept, Classification, AlphavilleSeries) as labels for the AlphavilleSeries.
 
@@ -59,13 +59,22 @@ The internal read should return what got written
 If not found, you'll get a 404 response.
 
 Empty fields are omitted from the response.
-`curl -H "X-Request-Id: 123" localhost:8080/alphavilleseries/bba39990-c78d-3629-ae83-808c333c6dbc`
+`curl -H "X-Request-Id: 123" localhost:8080/alphaville-series/bba39990-c78d-3629-ae83-808c333c6dbc`
 
 ### DELETE
 Will return 204 if successful, 404 if not found
-`curl -XDELETE -H "X-Request-Id: 123" localhost:8080/alphavilleseries/bba39990-c78d-3629-ae83-808c333c6dbc`
+`curl -XDELETE -H "X-Request-Id: 123" localhost:8080/alphaville-series/bba39990-c78d-3629-ae83-808c333c6dbc`
 
 ### Admin endpoints
 Healthchecks: [http://localhost:8080/__health](http://localhost:8080/__health)
 
 Ping: [http://localhost:8080/ping](http://localhost:8080/ping) or [http://localhost:8080/__ping](http://localhost:8080/__ping)
+
+### Caveat
+When you test integration with concept-ingester outside clustered container environment, e.g. your local machine,
+the workaround is to use `localhost:{--port}/__alphaville-series-rw-neo4j/alphaville-series/` 
+instead of `localhost:8080/alphaville-series/`.
+
+This is because you are not likely to have Vulkan to resolve hosts ports and paths in your local environment.
+#### Running in your local environment
+alphaville-series-rw-neo4j --port=XXXX
