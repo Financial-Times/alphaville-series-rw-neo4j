@@ -11,7 +11,6 @@ import (
 	"github.com/Financial-Times/neo-utils-go/neoutils"
 	log "github.com/Sirupsen/logrus"
 	"github.com/jawher/mow.cli"
-	"github.com/jmcvetta/neoism"
 )
 
 func init() {
@@ -58,28 +57,31 @@ func main() {
 	})
 
 	app.Action = func() {
-		db, err := neoism.Connect(*neoURL)
+		conf := neoutils.DefaultConnectionConfig()
+		conf.BatchSize = *batchSize
+		db, err := neoutils.Connect(*neoURL, conf)
+
 		if err != nil {
 			log.Errorf("Could not connect to neo4j, error=[%s]\n", err)
 		}
 
-		batchRunner := neoutils.NewBatchCypherRunner(neoutils.StringerDb{db}, *batchSize)
-		alphavilleSeriesDriver := alphavilleseries.NewCypherAlphavilleSeriesService(batchRunner, db)
+		alphavilleSeriesDriver := alphavilleseries.NewCypherAlphavilleSeriesService(db)
+		alphavilleSeriesDriver.Initialise()
 
 		baseftrwapp.OutputMetricsIfRequired(*graphiteTCPAddress, *graphitePrefix, *logMetrics)
 
-		endpoints := map[string]baseftrwapp.Service{
+		services := map[string]baseftrwapp.Service{
 			//use this key to integrate with concept-ingester outside cluster
 			"__alphaville-series-rw-neo4j/alphaville-series": alphavilleSeriesDriver,
 			"alphaville-series": alphavilleSeriesDriver,
 		}
 
 		var checks []v1a.Check
-		for _, e := range endpoints {
-			checks = append(checks, makeCheck(e, batchRunner))
+		for _, service := range services {
+			checks = append(checks, makeCheck(service, db))
 		}
 
-		baseftrwapp.RunServer(endpoints,
+		baseftrwapp.RunServer(services,
 			v1a.Handler("ft-alphaville-series_rw_neo4j ServiceModule", "Writes 'AlphavilleSeries' to Neo4j, usually as part of a bulk upload done on a schedule", checks...),
 			*port, "alphaville-series-rw-neo4j", "local")
 	}
