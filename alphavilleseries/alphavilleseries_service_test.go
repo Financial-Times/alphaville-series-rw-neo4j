@@ -5,9 +5,7 @@ import (
 	"testing"
 
 	"github.com/Financial-Times/neo-utils-go/neoutils"
-	"github.com/jmcvetta/neoism"
 	"github.com/stretchr/testify/assert"
-	"fmt"
 )
 
 const (
@@ -189,7 +187,7 @@ func TestSameSetOfValues(t *testing.T) {
 	assert.True(sameSetOfValues(x, y), "Arrays were equial but evaluated as not equal")
 }
 
-func sameSetOfValues(x []string, y[]string) bool {
+func sameSetOfValues(x []string, y []string) bool {
 	if len(x) != len(y) {
 		return false
 	}

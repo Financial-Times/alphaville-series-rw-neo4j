@@ -73,7 +73,7 @@ func main() {
 		services := map[string]baseftrwapp.Service{
 			//use this key to integrate with concept-ingester outside cluster
 			"__alphaville-series-rw-neo4j/alphaville-series": alphavilleSeriesDriver,
-			"alphaville-series": alphavilleSeriesDriver,
+			"alphaville-series":                              alphavilleSeriesDriver,
 		}
 
 		var checks []v1a.Check
