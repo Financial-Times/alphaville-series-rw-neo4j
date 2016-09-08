@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/Financial-Times/neo-utils-go/neoutils"
-	"github.com/jmcvetta/neoism"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,14 +21,14 @@ var defaultTypes = []string{"Thing", "Concept", "Classification", "AlphavilleSer
 
 func TestConnectivityCheck(t *testing.T) {
 	assert := assert.New(t)
-	seriesDriver := getAlphavilleSeriesCypherDriver(t)
+	seriesDriver := getAlphavilleSeriesService(t)
 	err := seriesDriver.Check()
 	assert.NoError(err, "Unexpected error on connectivity check")
 }
 
 func TestPrefLabelIsCorrectlyWritten(t *testing.T) {
 	assert := assert.New(t)
-	seriesDriver := getAlphavilleSeriesCypherDriver(t)
+	seriesDriver := getAlphavilleSeriesService(t)
 
 	alternativeIdentifiers := alternativeIdentifiers{UUIDS: []string{seriesUUID}}
 	seriesToWrite := AlphavilleSeries{UUID: seriesUUID, PrefLabel: prefLabel, AlternativeIdentifiers: alternativeIdentifiers}
@@ -48,7 +47,7 @@ func TestPrefLabelIsCorrectlyWritten(t *testing.T) {
 
 func TestPrefLabelSpecialCharactersAreHandledByCreate(t *testing.T) {
 	assert := assert.New(t)
-	seriesDriver := getAlphavilleSeriesCypherDriver(t)
+	seriesDriver := getAlphavilleSeriesService(t)
 
 	alternativeIdentifiers := alternativeIdentifiers{TME: []string{}, UUIDS: []string{seriesUUID}}
 	seriesToWrite := AlphavilleSeries{UUID: seriesUUID, PrefLabel: specialCharPrefLabel, AlternativeIdentifiers: alternativeIdentifiers}
@@ -64,7 +63,7 @@ func TestPrefLabelSpecialCharactersAreHandledByCreate(t *testing.T) {
 
 func TestCreateCompleteAlphavilleSeriesWithPropsAndIdentifiers(t *testing.T) {
 	assert := assert.New(t)
-	seriesDriver := getAlphavilleSeriesCypherDriver(t)
+	seriesDriver := getAlphavilleSeriesService(t)
 
 	alternativeIdentifiers := alternativeIdentifiers{TME: []string{tmeID}, UUIDS: []string{seriesUUID}}
 	seriesToWrite := AlphavilleSeries{UUID: seriesUUID, PrefLabel: prefLabel, AlternativeIdentifiers: alternativeIdentifiers}
@@ -80,7 +79,7 @@ func TestCreateCompleteAlphavilleSeriesWithPropsAndIdentifiers(t *testing.T) {
 
 func TestUpdateWillRemovePropertiesAndIdentifiersNoLongerPresent(t *testing.T) {
 	assert := assert.New(t)
-	seriesDriver := getAlphavilleSeriesCypherDriver(t)
+	seriesDriver := getAlphavilleSeriesService(t)
 
 	allAlternativeIdentifiers := alternativeIdentifiers{TME: []string{}, UUIDS: []string{seriesUUID}}
 	seriesToWrite := AlphavilleSeries{UUID: seriesUUID, PrefLabel: prefLabel, AlternativeIdentifiers: allAlternativeIdentifiers}
@@ -103,7 +102,7 @@ func TestUpdateWillRemovePropertiesAndIdentifiersNoLongerPresent(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	assert := assert.New(t)
-	seriesDriver := getAlphavilleSeriesCypherDriver(t)
+	seriesDriver := getAlphavilleSeriesService(t)
 
 	alternativeIdentifiers := alternativeIdentifiers{TME: []string{tmeID}, UUIDS: []string{seriesUUID}}
 	seriesToDelete := AlphavilleSeries{UUID: seriesUUID, PrefLabel: prefLabel, AlternativeIdentifiers: alternativeIdentifiers}
@@ -123,7 +122,7 @@ func TestDelete(t *testing.T) {
 
 func TestCount(t *testing.T) {
 	assert := assert.New(t)
-	seriesDriver := getAlphavilleSeriesCypherDriver(t)
+	seriesDriver := getAlphavilleSeriesService(t)
 
 	alternativeIds := alternativeIdentifiers{TME: []string{tmeID}, UUIDS: []string{seriesUUID}}
 	seriesOneToCount := AlphavilleSeries{UUID: seriesUUID, PrefLabel: prefLabel, AlternativeIdentifiers: alternativeIds}
@@ -157,16 +156,21 @@ func readAlphavilleSeriesForUUIDAndCheckFieldsMatch(assert *assert.Assertions, s
 	assert.True(sameSetOfValues(expectedAlphavilleSeries.Types, storedAlphavilleSeries.(AlphavilleSeries).Types), "Types should be the same")
 }
 
-func getAlphavilleSeriesCypherDriver(t *testing.T) service {
+func getAlphavilleSeriesService(t *testing.T) service {
 	assert := assert.New(t)
 	url := os.Getenv("NEO4J_TEST_URL")
 	if url == "" {
 		url = "http://localhost:7474/db/data"
 	}
 
-	db, err := neoism.Connect(url)
+	conf := neoutils.DefaultConnectionConfig()
+	conf.Transactional = false
+	db, err := neoutils.Connect(url, conf)
 	assert.NoError(err, "Failed to connect to Neo4j")
-	return NewCypherAlphavilleSeriesService(neoutils.StringerDb{db}, db)
+
+	service := NewCypherAlphavilleSeriesService(db)
+	service.Initialise()
+	return service
 }
 
 func cleanUp(assert *assert.Assertions, uuid string, seriesDriver service) {
@@ -183,7 +187,7 @@ func TestSameSetOfValues(t *testing.T) {
 	assert.True(sameSetOfValues(x, y), "Arrays were equial but evaluated as not equal")
 }
 
-func sameSetOfValues(x []string, y[]string) bool {
+func sameSetOfValues(x []string, y []string) bool {
 	if len(x) != len(y) {
 		return false
 	}
