@@ -76,4 +76,4 @@ instead of `localhost:8080/alphaville-series/`.
 
 This is because you are not likely to have Vulkan to resolve hosts ports and paths in your local environment.
 #### Running in your local environment
-alphaville-series-rw-neo4j --port=XXXX
+alphaville-series-rw-neo4j --port=XXXX 
