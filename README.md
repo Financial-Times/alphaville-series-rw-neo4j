@@ -1,6 +1,5 @@
 # AlphavilleSeries Reader/Writer for Neo4j (alphaville-series-rw-neo4j)
-[![Circle CI](https://circleci.com/gh/Financial-Times/alphaville-series-rw-neo4j/tree/master.png?style=shield)](https://circleci.com/gh/Financial-Times/alphaville-series-rw-neo4j/tree/master)
-
+[![Circle CI](https://circleci.com/gh/Financial-Times/alphaville-series-rw-neo4j.svg?style=shield)](https://circleci.com/gh/Financial-Times/alphaville-series-rw-neo4j)[![Go Report Card](https://goreportcard.com/badge/github.com/Financial-Times/alphaville-series-rw-neo4j)](https://goreportcard.com/report/github.com/Financial-Times/alphaville-series-rw-neo4j) [![Coverage Status](https://coveralls.io/repos/github/Financial-Times/alphaville-series-rw-neo4j/badge.svg)](https://coveralls.io/github/Financial-Times/alphaville-series-rw-neo4j)
 __An API for reading/writing alphaville-series into Neo4j. Expects the alphaville-series json supplied to be in the format that comes out of the alphaville-series transformer.__
 
 ## Installation
@@ -77,4 +76,4 @@ instead of `localhost:8080/alphaville-series/`.
 
 This is because you are not likely to have Vulkan to resolve hosts ports and paths in your local environment.
 #### Running in your local environment
-alphaville-series-rw-neo4j --port=XXXX
+alphaville-series-rw-neo4j --port=XXXX 
